@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palindrome with Minimum Sum — Code Explainer</title>
+<style>
+:root{--bg:#0b0f17;--pn:#121826;--pn2:#182033;--tx:#e6edf6;--mu:#8a97ab;--cy:#4dd8e8;--ye:#f5c84b;--gr:#4ade80;--rd:#f87171;--bd:#26304a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 "Segoe UI",system-ui,sans-serif}
+body{padding:14px;max-width:1280px;margin:auto}
+h1{font-size:1.35rem;margin:0 0 2px}
+.sub{color:var(--mu);margin:0 0 12px;font-size:.9rem}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+button{background:var(--pn2);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px 14px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--cy)}button:focus-visible,input:focus-visible{outline:2px solid var(--cy);outline-offset:2px}
+button.pri{background:var(--cy);color:#06222a;border-color:var(--cy);font-weight:600}
+button:disabled{opacity:.4;cursor:default}
+input{background:var(--pn);color:var(--tx);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font:1rem ui-monospace,Consolas,monospace;width:11rem}
+.chip{font-family:ui-monospace,Consolas,monospace;font-size:.9rem}
+#err{color:var(--rd);min-height:1.3em;font-size:.9rem}
+.bar{height:6px;background:var(--pn2);border-radius:6px;overflow:hidden;margin:6px 0 12px}
+#pg{height:100%;width:0;background:linear-gradient(90deg,var(--cy),var(--gr));transition:width .25s}
+.grid{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:980px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.card{background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:12px}
+#code{height:270px;overflow:auto;position:relative;font:13px/1.55 ui-monospace,Consolas,monospace;padding:8px 0}
+@media(min-width:980px){#code{height:560px}}
+.ln{min-height:1.55em;display:flex;white-space:pre;padding:0 10px;border-left:3px solid transparent;min-width:max-content}
+.ln .no{color:#5a6785;width:2.2em;flex:none;user-select:none}
+.ln.act{background:#1c2a44;border-left-color:var(--ye)}
+.kw{color:#c79bff}.st{color:var(--gr)}.nu{color:var(--ye)}.cm{color:#6f7d99;font-style:italic}.id{color:#9fd8ff}
+.act .id{color:var(--ye);font-weight:700}
+#cells{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:6px 0 2px}
+.cell{display:flex;flex-direction:column;align-items:center;width:42px}
+.pt{height:1.3em;font:700 .8rem ui-monospace,monospace;color:var(--cy);text-align:center;white-space:nowrap}
+.pt.b{color:var(--ye)}
+.box{width:42px;height:46px;border:2px solid var(--bd);border-radius:8px;display:grid;place-items:center;font:700 1.35rem ui-monospace,monospace;background:var(--pn2);position:relative;transition:border-color .2s,background .2s}
+.box.q{color:var(--mu);border-style:dashed}
+.idx{color:var(--mu);font:.75rem ui-monospace,monospace;margin-top:2px}
+.old{font:.7rem ui-monospace,monospace;color:var(--ye);height:1em}
+.eq{border-color:var(--gr);background:#12301f}.bad{border-color:var(--rd);background:#3a1717}
+.cl{border-color:var(--cy);background:#0f2f36}.cr{border-color:var(--ye);background:#33290c}
+.qq{border-color:var(--mu)}.src{border-color:var(--cy)}.cur{border-color:var(--ye);background:#33290c}
+.chg{box-shadow:0 0 0 3px rgba(245,200,75,.35)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.75rem;color:var(--mu);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;border:2px solid;margin-right:4px}
+#vars{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.v{font:.85rem ui-monospace,monospace;background:var(--pn2);border:1px solid var(--bd);border-radius:6px;padding:2px 8px}
+.v.c{border-color:var(--ye);color:var(--ye)}
+#chg{font:.85rem ui-monospace,monospace;color:var(--ye);margin-top:8px;min-height:1.2em}
+#hi{font-size:1.05rem;margin:0 0 8px}
+.lab{color:var(--cy);font-weight:600}
+.res{margin-top:8px;padding:8px 10px;border-radius:8px;background:#12301f;border:1px solid var(--gr);font-weight:700}
+.res.neg{background:#3a1717;border-color:var(--rd)}
+details{margin-top:12px;font-size:.9rem;color:var(--mu)}summary{cursor:pointer;color:var(--tx)}
+details li{margin:4px 0}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<h1>Palindrome with Minimum Sum — line by line</h1>
+<p class="sub">Tumhara comment-free C++ code, har line alag step mein. Ye browser mein C++ run nahi karta: JavaScript uss logic ko line-by-line replay karta hai.</p>
+
+<div class="row" id="samples" aria-label="Sample inputs"></div>
+<form class="row" id="f">
+  <label for="inp" class="sub" style="margin:0">Apni string (a–z aur ?):</label>
+  <input id="inp" maxlength="20" autocomplete="off" spellcheck="false" value="ab??ba">
+  <button class="pri" type="submit">Load</button>
+</form>
+<div id="err" role="alert"></div>
+
+<div class="row">
+  <button id="prev">◀ Previous</button><button id="next" class="pri">Next ▶</button>
+  <button id="play">▶ Auto-play</button><button id="pause">⏸ Pause</button><button id="reset">⟲ Reset</button>
+  <label class="sub" style="margin:0">Speed <select id="spd"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+  <span class="sub" id="cnt" style="margin:0 0 0 6px"></span>
+</div>
+<div class="bar"><div id="pg"></div></div>
+
+<div class="grid">
+  <div class="card" id="code" aria-label="C++ code"></div>
+  <div>
+    <div class="card">
+      <div id="cells"></div>
+      <div class="legend">
+        <span><i style="border-color:var(--gr)"></i>dono fixed, equal</span>
+        <span><i style="border-color:var(--rd)"></i>dono fixed, unequal → -1</span>
+        <span><i style="border-color:var(--cy)"></i>left ?, right se copy</span>
+        <span><i style="border-color:var(--ye)"></i>right ?, left se copy</span>
+        <span><i style="border-color:var(--mu)"></i>dono ?, baad mein</span>
+      </div>
+      <div id="chg"></div>
+      <div id="vars"></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <p id="hi"></p>
+      <p id="why" style="margin:6px 0"></p>
+      <p id="nx" style="margin:6px 0"></p>
+      <p id="rm" style="margin:6px 0"></p>
+      <div id="res"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+"use strict";
+/* ---------- The exact C++ code, one string per line ---------- */
+const CODE=[
+"class Solution {",
+"  public:",
+"    int minimumSum(string &s) {",
+"        int i = 0;",
+"        int n = s.length();",
+"        int j = s.length() - 1;",
+"",
+"        while (i < j) {",
+"            if (s[i] != '?' && s[j] != '?' && s[i] != s[j])",
+"                return -1;",
+"",
+"            if (s[i] == '?' && s[j] != '?') {",
+"                s[i] = s[j];",
+"            } else if (s[i] != '?' && s[j] == '?') {",
+"                s[j] = s[i];",
+"            }",
+"",
+"            i++;",
+"            j--;",
+"        }",
+"",
+"        int m = (n + 1) / 2;",
+"        int k = 0;",
+"",
+"        while (k < m && s[k] == '?') {",
+"            k++;",
+"        }",
+"",
+"        if (k == m) {",
+"            for (int i = 0; i < n; i++) {",
+"                s[i] = 'a';",
+"            }",
+"            return 0;",
+"        }",
+"",
+"        for (int i = 0; i < k; i++) {",
+"            char kChar = s[k];",
+"            s[i] = kChar;",
+"        }",
+"",
+"        for (int p = k + 1; p < m; p++) {",
+"            if (s[p] == '?') {",
+"                s[p] = s[p - 1];",
+"            }",
+"        }",
+"",
+"        for (int p = 0; p < m; p++) {",
+"            s[n - 1 - p] = s[p];",
+"        }",
+"",
+"        int ans = 0;",
+"",
+"        for (int i = 0; i < n / 2; i++) {",
+"            ans += abs(s[i] - s[i + 1]);",
+"        }",
+"",
+"        return 2 * ans;",
+"    }",
+"};"];
+const RM={"0": "Class wrapper hata do to function Solution ke andar nahi rahega aur judge ise call nahi kar payega.", "1": "public: hataya to class ke members private ho jaate, bahar se minimumSum call nahi hota.", "2": "& hataya to s ki copy banti: return value wahi aata par original string update nahi hoti.", "3": "i na ho to left pointer nahi, pairs ko order mein dekhna possible nahi.", "4": "n na ho to m aur mirror index n-1-p ke liye length baar-baar s.length() se nikalni padti.", "5": "j na ho to mirror partner nahi milta. n-1 ki jagah n likhte to s[n] out-of-range hota.", "7": "Loop condition hataya ya galat hui to pointers cross ho kar pairs dobara check karte, ya koi pair chhoot jaata.", "8": "Ye check hata do to conflicting fixed letters ('b' aur 'c') ignore ho jaate aur baad ka mirror ek ko chupchaap overwrite kar deta: galat answer.", "9": "return -1 hataya to impossible string par bhi cost return hota.", "11": "Ye hataya to left '?' bacha rehta aur right ka known letter left tak nahi pahunchta.", "12": "Assignment hataya to condition true hone par bhi '?' wahi rehta.", "13": "Ye else-if hataya to 'left known, right ?' wale pairs adhure rehte.", "14": "Assignment hataya to right '?' left se match nahi hota.", "17": "i++ hataya to wahi pair baar-baar check hota: infinite loop.", "18": "j-- hataya to right pointer wahin atka rahta aur pairs sahi mirror nahi hote: infinite loop.", "21": "m hataya to first half ka size nahi. n/2 (floor) lete to odd length mein middle character chhoot jaata.", "22": "k=0 nahi to k ki starting value undefined, search start nahi hoti.", "24": "Isko hataya to pehla known nahi milta. k<m hataya to saare '?' par k m se aage badhta (out-of-range). s[k]=='?' hataya to k pehle hi step par ruk jaata.", "25": "k++ hataya to infinite loop jab s[0]=='?'.", "28": "Check hataya to k==m par s[k] padha jaata, jo first half ke bahar hai (n=1 mein out-of-range) aur galat letter se fill hota.", "29": "Loop hataya to string ka koi character 'a' nahi banta.", "30": "Assignment hataya to string '?' hi rehti aur 0 return hone par bhi valid palindrome nahi banta.", "32": "return 0 hataya to code neeche chalta aur k==m par s[k] galat padhta.", "35": "Loop hataya to leading '?' bhare nahi jaate, mirror ke baad '?' wali palindrome milti.", "36": "kChar sirf readability ke liye hai. Hata kar seedha s[k] likhne par result same rahega.", "37": "Assignment hataya to leading '?' ki jagah koi letter nahi aata, cost galat.", "40": "Loop hataya to beech ke '?' bhare nahi jaate.", "41": "If hataya to fixed letters bhi previous letter se overwrite ho jaate: string badal jaati.", "42": "Assignment hataya to '?' bacha rehta aur cost mein ('?' - letter) ka kachra aata.", "46": "Mirror loop hataya to second half first half ke barabar nahi hota: palindrome pakka nahi.", "47": "Assignment hataya to second half ke '?' bache rehte.", "50": "ans=0 nahi to ans mein garbage value hoti aur cost galat aata.", "52": "Boundary galat ho to ya pairs chhoot jaate ya s[i+1] out-of-range padhta.", "53": "Ye line hatao to ans hamesha 0 rehta aur cost galat.", "56": "2* hataya to sirf first half ki cost return hoti, poori palindrome ki nahi."};
+const SAMPLES=["ab??ba","a??a","????","abca","a?b?a"];
+
+/* ---------- build(): replays the C++ logic, recording one snapshot per explained step ---------- */
+function build(str){
+  const s=str.split(""),n=s.length,S=[];let V={};
+  // classify a mirrored pair so the UI can colour it
+  const cls=(a,b)=>a!="?"&&b!="?"?(a==b?"eq":"bad"):a=="?"&&b=="?"?"qq":a=="?"?"cl":"cr";
+  // P(): store line, explanation, string snapshot, variables and pointers after this step
+  function P(line,hi,o={}){
+    const pt=line<=19?{i:V.i,j:V.j}:{i:V.li,k:V.k,p:V.p};
+    S.push({line,hi,why:o.why||"",nx:o.nx||"",ch:o.ch||[],hl:o.hl||{},s:s.slice(),v:{...V},pt,res:o.res});
+  }
+  // set(): perform one assignment s[idx]=to and report the change
+  const set=(idx,to)=>{const from=s[idx];s[idx]=to;return [{idx,from,to}]};
+  const pairHl=(i,j)=>{const c=cls(s[i],s[j]);return {[i]:c,[j]:c}};
+
+  P(0,"Class wrapper: Solution class ke andar minimumSum rehta hai. Runtime par kuch nahi badalta.");P(1,"public: judge bahar se minimumSum call kar sake.");
+  P(2,"Function string s ko reference (&) se leta hai. Matlab hum original string ko hi badalte jaayenge, copy nahi banti.",
+    {why:"Isliye har s[x]=... assignment seedha string mein dikhega.",nx:"Palindrome mein s[x] ka partner s[n-1-x] hota hai. Pehle us pair tak pahunchne ke liye pointers chahiye."});
+  V.i=0;P(3,"i=0: left pointer, pehle character par.",{why:"Left se shuru karte hain taaki har character apne mirror se mil sake.",nx:"Right pointer ke liye length chahiye."});
+  V.n=n;P(4,`n=${n}: string ki length ek baar store kar li.`,{why:"Baar-baar s.length() nahi likhna; aage m aur mirror index n-1-p mein kaam aayega.",nx:"Ab right pointer."});
+  V.j=n-1;P(5,`j=n-1=${n-1}: last index (0-based). i aur j pehla mirror pair bante hain.`,{why:"Palindrome tabhi hai jab s[i]==s[j] har pair ke liye.",nx:"Ab i aur j ko andar ki taraf le jaate hue har pair check karenge."});
+
+  while(true){
+    const i=V.i,j=V.j;
+    if(!(i<j)){
+      P(7,`i(${i}) < j(${j}) false, loop khatam. ${n%2?"Odd length: i==j middle par ruka. Middle ka koi alag partner nahi, wo khud ka mirror hai.":"Even length: i ne j ko cross kar liya, har character ka partner dekh liya."}`,
+        {why:"Ab har fixed letter apne mirror position par bhi pahunch chuka hai.",nx:"Pairs consistent hain. Ab sirf first half decide karna hai, doosra half uska mirror ban jaayega."});
+      break;
+    }
+    P(7,`i(${i}) < j(${j}) true: abhi ek mirror pair (${i}, ${j}) bacha hai.`,{hl:pairHl(i,j),why:"Jab i,j mil jaate hain ya cross karte hain, saare pairs dekh liye."});
+    const a=s[i],b=s[j],c=cls(a,b);
+    if(c=="bad"){
+      P(8,`Teeno conditions true: dono fixed aur '${a}' ≠ '${b}'. Mirror positions par alag letters hain aur koi '?' nahi jo ise sudhaar sake.`,{hl:pairHl(i,j)});
+      P(9,"return -1: palindrome impossible, function yahin khatam.",{hl:pairHl(i,j),why:"Fixed letters badle nahi ja sakte, isliye yahin rok dena sahi hai.",res:-1});
+      return S;
+    }
+    const t8={eq:`Dono fixed aur barabar ('${a}','${b}'): kuch badalna nahi, condition false.`,
+      qq:"Dono '?': abhi kuch decide nahi ho sakta. Inhe first half fill karte waqt ek saath bharenge.",
+      cl:`Left '?' hai, right fixed '${b}'. Condition false, aage jaate hain.`,cr:`Left fixed '${a}', right '?'. Condition false, aage jaate hain.`}[c];
+    P(8,t8,{hl:pairHl(i,j),why:"Ye line sirf conflict pakadti hai: dono fixed aur alag."});
+    if(c=="cl"){
+      P(11,`s[i]=='?' aur s[j]!='?' true: left unknown, right known.`,{hl:pairHl(i,j)});
+      const ch=set(i,b);
+      P(12,`s[${i}]=s[${j}]: '?' ki jagah '${b}'.`,{ch,hl:pairHl(i,j),why:`Palindrome mein s[${i}] ko s[${j}] jaisa hona hi padega, koi aur option nahi.`,nx:"Pair solve ho gaya. i++ aur j-- se agla pair."});
+    }else{
+      P(11,"Condition false (left '?' nahi hai ya right bhi '?' hai), to else-if dekhte hain.",{hl:pairHl(i,j)});
+      if(c=="cr"){
+        P(13,`s[i]!='?' aur s[j]=='?' true: right unknown, left known.`,{hl:pairHl(i,j)});
+        const ch=set(j,a);
+        P(14,`s[${j}]=s[${i}]: '?' ki jagah '${a}'.`,{ch,hl:pairHl(i,j),why:`Mirror partner ko '${a}' hi hona hai.`,nx:"i++ aur j-- se agla pair."});
+      }else P(13,c=="eq"?"Else-if bhi false: pair pehle se theek hai.":"Else-if bhi false: dono '?', koi copy nahi. Pair abhi open rahega.",{hl:pairHl(i,j)});
+    }
+    V.i++;P(17,`i++ : i=${V.i}. Left pointer ek aage.`,{hl:pairHl(i,j)});
+    V.j--;P(18,`j-- : j=${V.j}. Right pointer ek peeche.`,{nx:"Phir se while condition check hoti hai."});
+  }
+
+  const m=(n+1)/2|0;V.m=m;
+  P(21,`m=(n+1)/2=(${n}+1)/2=${m}. Ye ceil(n/2) hai: odd n=5 → 6/2=3 (middle ko include karta hai), even n=6 → 7/2=3 (sirf aadha).`,
+    {why:"Pehla half decide ho jaaye to doosra half mirror se banega. Odd mein middle bhi first half ka hissa hona chahiye, isliye +1.",nx:"First half mein pehla known letter dhundhte hain, usi se '?' bharne ka rule banega."});
+  V.k=0;P(22,"k=0: pehla known character dhundhne ka pointer.",{});
+  while(true){
+    const hl={};if(V.k<m)hl[V.k]="cur";
+    if(!(V.k<m)){P(24,`k<m false (k=${V.k}, m=${m}): first half khatam, koi known nahi mila. k<m guard isliye hai ki hum first half se bahar na dekhein.`,{why:"Pass 1 ne har known letter ko dono taraf copy kar diya tha. Agar first half mein koi known nahi, to second half mein bhi nahi.",nx:"Iska matlab string poori '?' hai."});break}
+    if(s[V.k]!="?"){P(24,`k<m true, s[${V.k}]='${s[V.k]}' ≠ '?' false: known character mil gaya, loop ruk gaya.`,{hl,why:"s[k]=='?' ka matlab abhi unknown hai. Jaise hi false, humein pehla known mil gaya.",nx:"Ab dekhte hain k==m hai ya nahi."});break}
+    P(24,`k<m true aur s[${V.k}]=='?' true: abhi bhi unknown, aage badho.`,{hl});
+    V.k++;P(25,`k++ : k=${V.k}.`,{});
+  }
+  if(V.k==m){
+    P(28,`k==m true: first half mein ek bhi known character nahi. Matlab string poori '?' hai.`,{why:"Koi constraint nahi, isliye kisi bhi letter se bhar sakte hain.",nx:"Sabko same letter se bharenge."});
+    V.li=0;P(29,"Poori string par loop chalate hain.",{});
+    for(let q=0;q<n;q++){V.li=q;const ch=set(q,"a");P(30,`s[${q}]='a'.`,{ch,hl:{[q]:"cur"},why:q==0?"Sab 'a' hone se har adjacent difference |a-a|=0, to total cost 0.":"",nx:q==n-1?"Cost 0 hai, ab seedha return 0.":""})}
+    P(32,"return 0: saare characters 'a', koi adjacent difference nahi, minimum possible cost 0.",{res:0});
+    return S;
+  }
+  P(28,`k==m false: pehla known character index k=${V.k} par '${s[V.k]}' hai.`,{hl:{[V.k]:"src"},nx:"Ab uske pehle ke '?' aur uske baad ke '?' bharne hain."});
+  const kc=s[V.k];
+  V.li=0;
+  P(35,V.k==0?"k=0: leading '?' hain hi nahi, ye loop skip hoga.":`Pehle ${V.k} characters '?' hain. Unke aage-peeche koi constraint nahi, sirf pehla known '${kc}' hi paas hai.`,
+    {hl:{[V.k]:"src"},why:V.k?`Unhe '${kc}' se bharne par pehle ${V.k} pairs ka diff 0 rahega. Koi aur letter x rakhte to |x-'${kc}'| extra cost add hota.`:"",nx:V.k?"Har leading index par kChar le kar assign karte hain.":"Seedha beech ke '?' par jaate hain."});
+  for(let q=0;q<V.k;q++){
+    V.li=q;V.kChar=kc;P(36,`kChar=s[${V.k}]='${kc}': pehla known letter yaad rakha.`,{hl:{[V.k]:"src"}});
+    const ch=set(q,kc);P(37,`s[${q}]=kChar: '?' ki jagah '${kc}'.`,{ch,hl:{[V.k]:"src",[q]:"cur"}});
+  }
+  delete V.li;
+  V.p=V.k+1;
+  P(40,`p=k+1=${V.p} se m=${m} tak: baaki '?' bharte hain.`,
+    {hl:{[V.k]:"src"},why:"Rule: '?' ko pichhle character ki copy banao. Example 'a??c': copy-previous 'aaac' → diffs 0,0,2 = 2. Beech mein koi aur letter, jaise 'abbc' → 1,0,1 = 2. Kam nahi hota, kyunki a se c tak ka |a-c|=2 jump kisi bhi tarah chukana hi padta hai. Copy-previous kabhi extra jump nahi jodta.",nx:"Har p par check: '?' hai ya fixed?"});
+  for(;V.p<m;V.p++){
+    const p=V.p;
+    P(41,s[p]=="?"?`s[${p}]=='?' true: unknown, pichhle character par nirbhar karega.`:`s[${p}]='${s[p]}' fixed hai, condition false. Ise chhedna nahi.`,
+      {hl:{[p]:"cur",[p-1]:"src"},why:s[p]=="?"?"":"Fixed letter se aane wala jump unavoidable hai, wahi cost mein jaayega."});
+    if(s[p]=="?"){const ch=set(p,s[p-1]);P(42,`s[${p}]=s[${p-1}]='${s[p-1]}': pichhla letter copy kiya.`,{ch,hl:{[p]:"cur",[p-1]:"src"},nx:"Same letter, to ye adjacent pair 0 cost dega."})}
+  }
+  P(40,`p=${V.p} < m false: first half poora fill ho gaya, koi '?' nahi bacha.`,{nx:"Ab first half ko mirror karke second half banate hain."});
+  delete V.p;V.p=0;
+  P(46,`Ab s[n-1-p]=s[p] for p=0..m-1. Index p ka mirror n-1-p hai. n=${n} ke liye ${n%2?"odd: middle index "+((n-1)/2)+" apna hi mirror hai.":"even: koi middle nahi, har index ka alag partner."}`,
+    {why:"Pass 1 mein '?' pairs adhure the. Ab first half final hai, to second half = uska mirror. Isse palindrome pakka banta hai.",nx:"Ek ek p par copy dekhte hain."});
+  for(V.p=0;V.p<m;V.p++){
+    const p=V.p,q=n-1-p;
+    const ch=set(q,s[p]);
+    P(47,p==q?`p=${p}: n-1-p=${q}, wahi index. Middle apna hi mirror hai, isliye khud ko khud se copy, kuch nahi badla.`:`p=${p} → n-1-p=${q}: s[${q}]=s[${p}]='${s[p]}'.`,
+      {ch:ch[0].from==ch[0].to?[]:ch,hl:{[p]:"src",[q]:"cur"},nx:p==m-1?"String ab palindrome hai. Ab cost nikalte hain.":""});
+  }
+  delete V.p;
+  V.ans=0;P(50,"ans=0: first half ke adjacent differences ka running sum.",{why:"Teen cheezein alag hain: (1) ek adjacent pair ka difference, (2) first half ka running sum ans, (3) final total = 2*ans."});
+  V.li=0;
+  P(52,`i=0 se n/2=${(n/2)|0} tak adjacent pairs (i,i+1).`,{why:"Poori string ke pairs mein second half ke pairs first half ke mirror image hain, unka cost same. Isliye aadhe ginkar baad mein ×2."+(n%2==0?" Even n mein last pair centre ke do mirror characters ka hai, diff 0.":""),nx:"Har pair ka |difference| ans mein jodte hain."});
+  for(let q=0;q<((n/2)|0);q++){
+    V.li=q;const d=Math.abs(s[q].charCodeAt(0)-s[q+1].charCodeAt(0));V.d=d;V.ans+=d;
+    P(53,`|'${s[q]}' − '${s[q+1]}'| = |${s[q].charCodeAt(0)} − ${s[q+1].charCodeAt(0)}| = ${d}. Running sum ans=${V.ans}.`,{hl:{[q]:"src",[q+1]:"cur"}});
+  }
+  P(56,`return 2*ans = 2 × ${V.ans} = ${2*V.ans}. Ans first half ka sum tha, doosra half uska mirror hai, to total double.`,{res:2*V.ans});
+  return S;
+}
+
+/* ---------- UI ---------- */
+let steps=[],idx=0,timer=null;
+const $=id=>document.getElementById(id);
+// hl(): tiny C++ syntax highlighter that builds spans with textContent (safe, no innerHTML)
+function hl(line,el){
+  const re=/(\/\/.*)|('[^']*')|\b(class|public|int|char|while|for|if|else|return|string)\b|\b(\d+)\b|\b(i|j|n|m|k|p|s|ans|kChar)\b/g;
+  let last=0,mm;
+  while((mm=re.exec(line))){
+    if(mm.index>last)el.append(line.slice(last,mm.index));
+    const sp=document.createElement("span");
+    sp.className=mm[1]?"cm":mm[2]?"st":mm[3]?"kw":mm[4]?"nu":"id";
+    sp.textContent=mm[0];el.append(sp);last=re.lastIndex;
+  }
+  el.append(line.slice(last));
+}
+const lineEls=CODE.map((t,k)=>{
+  const d=document.createElement("div");d.className="ln";
+  const no=document.createElement("span");no.className="no";no.textContent=k+1;d.append(no);
+  const c=document.createElement("span");hl(t,c);d.append(c);$("code").append(d);return d;
+});
+// stop(): clear the single timer so auto-play never stacks
+function stop(){if(timer){clearInterval(timer);timer=null}}
+const names={li:"i (loop)"};
+// render(): draw the step at idx from its stored snapshot, so Previous/Next always show a consistent state
+function render(){
+  const st=steps[idx],pv=steps[idx-1]||{v:{},s:[]};
+  lineEls.forEach((e,k)=>e.classList.toggle("act",k===st.line));
+  const a=lineEls[st.line];$("code").scrollTop=a.offsetTop-$("code").clientHeight/2;
+  const cells=$("cells");cells.replaceChildren();
+  st.s.forEach((ch,k)=>{
+    const c=document.createElement("div");c.className="cell";
+    const pt=document.createElement("div");pt.className="pt";
+    const lbl=Object.entries(st.pt).filter(([,v])=>v===k).map(([n])=>n);pt.textContent=lbl.join(",");
+    const o=document.createElement("div");o.className="old";
+    const ce=st.ch.find(x=>x.idx===k);if(ce)o.textContent="was "+ce.from;
+    const b=document.createElement("div");b.className="box"+(ch=="?"?" q":"")+(st.hl[k]?" "+st.hl[k]:"")+(ce?" chg":"");b.textContent=ch;
+    const ix=document.createElement("div");ix.className="idx";ix.textContent=k;
+    c.append(pt,b,ix,o);cells.append(c);
+  });
+  $("chg").textContent=st.ch.length?st.ch.map(x=>`s[${x.idx}]: '${x.from}' → '${x.to}'`).join("  "):"";
+  const vs=$("vars");vs.replaceChildren();
+  const sc=document.createElement("span");sc.className="v";sc.textContent='s = "'+st.s.join("")+'"';vs.append(sc);
+  Object.entries(st.v).forEach(([n,v])=>{
+    const e=document.createElement("span"),old=pv.v[n];
+    const ch=old!==undefined&&old!==v;e.className="v"+(ch||old===undefined?" c":"");
+    const val=typeof v=="string"?`'${v}'`:v;
+    e.textContent=(names[n]||n)+" = "+(ch?`${typeof old=="string"?`'${old}'`:old} → ${val}`:val);vs.append(e);
+  });
+  $("hi").textContent=st.hi;
+  const w=$("why"),x=$("nx");
+  w.replaceChildren();x.replaceChildren();
+  if(st.why){const l=document.createElement("span");l.className="lab";l.textContent="Kyun? ";w.append(l,st.why)}
+  if(st.nx){const l=document.createElement("span");l.className="lab";l.textContent="Aage? ";x.append(l,st.nx)}
+  const rmE=$("rm");rmE.replaceChildren();
+  if(RM[st.line]){const l=document.createElement("span");l.className="lab";l.textContent="Hata do to? ";rmE.append(l,RM[st.line])}
+  const r=$("res");r.replaceChildren();
+  if(st.res!==undefined){const d=document.createElement("div");d.className="res"+(st.res<0?" neg":"");d.textContent="return "+st.res;r.append(d)}
+  $("pg").style.width=((idx+1)/steps.length*100)+"%";
+  $("cnt").textContent=`Step ${idx+1} / ${steps.length}`;
+  $("prev").disabled=idx===0;$("next").disabled=idx===steps.length-1;
+}
+function go(n){idx=Math.max(0,Math.min(steps.length-1,n));render();if(idx===steps.length-1)stop()}
+// load(): validate the input, rebuild the steps and reset the player
+function load(v){
+  stop();$("err").textContent="";
+  if(!v){$("err").textContent="String khaali hai. Kam se kam ek character likho.";return}
+  if(!/^[a-z?]+$/.test(v)){$("err").textContent="Sirf lowercase a–z aur ? allowed hain (spaces nahi).";return}
+  $("inp").value=v;steps=build(v);idx=0;render();
+}
+SAMPLES.forEach(sm=>{const b=document.createElement("button");b.className="chip";b.textContent=sm;b.type="button";b.onclick=()=>load(sm);$("samples").append(b)});
+$("f").onsubmit=e=>{e.preventDefault();load($("inp").value.trim())};
+$("prev").onclick=()=>{stop();go(idx-1)};
+$("next").onclick=()=>{stop();go(idx+1)};
+function startPlay(){stop();timer=setInterval(()=>go(idx+1),2200/parseFloat($("spd").value))}
+$("play").onclick=()=>{if(idx>=steps.length-1){idx=0;render()}startPlay()};
+$("spd").onchange=()=>{if(timer)startPlay()};
+$("pause").onclick=stop;
+$("reset").onclick=()=>{stop();go(0)};
+document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT")return;if(e.key==="ArrowRight"){stop();go(idx+1)}if(e.key==="ArrowLeft"){stop();go(idx-1)}});
+load("ab??ba");
+</script>
+</body>
+</html>
